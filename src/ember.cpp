@@ -1,4 +1,5 @@
 #include "ember.hpp"
+#include "display.hpp"
 
 // Turn a word into a number. Accepts decimal (65) and hex (0x41).
 // Returns false if the word is not a number at all.
@@ -133,7 +134,6 @@ void cmd_set16(Memory& mem, istringstream& words){
 
 
 void cmd_run(CPU& cpu) {
-    const size_t MAX_STEPS = 100'000;
     size_t steps = 0;
 
     if (cpu.halted) {
@@ -153,19 +153,30 @@ void cmd_run(CPU& cpu) {
     }   
 }
 
-//  find <lo> <hi> <byte>
+//  find <lo> <hi> <byte> <?deepth=8>
 //  <lo> <hi> - це адреса, з якої почати пошук (глибиною 8 байт)
 //  <byte> - яке значення шукаємо?
-void cmd_find(Memory& mem, istringstream& words){
-    string l, h, b;
+void cmd_find(Memory& mem, istringstream &words, bool first_only){
+    string l, h, b, d;
     long low, high, search_byte;
+    int deepth = 8;
 
     if( //  зчитування слів, перетворення у числа
         !(words >> l) || !(words >> h) || !(words >> b) ||
         !parse_number(l, low) || !parse_number(h, high) || !parse_number(b, search_byte)
     ) {
-        cout << "usage: find <lo> <hi> <byte>\n";
+        cout << "usage: find <lo> <hi> <byte> <?deepth=8>\n";
         return;
+    }
+
+    long ldeepth = 0;       //  зчитування глибини пошуку (опціонально)
+    if(words >> d) {
+        parse_number(d, ldeepth);       //  перетворення у число
+
+        if(ldeepth > 0 && (size_t)ldeepth < MEM_SIZE){
+            //  якщо більше 0 та менше за розмір пам'яті - прийняти значення
+            deepth = ldeepth;
+        }
     }
 
     //  збірка 16-адреси з двох байтів (8)
@@ -175,26 +186,51 @@ void cmd_find(Memory& mem, istringstream& words){
 
     //  перетворення шуканого байту у число
     long byte_value = static_cast<long>(search_byte);
-    if(byte_value < 0 || byte_value > 255) {    //  перевірка меж
-        cout << "address must not be 0-255, got " << byte_value << "\n";
+    if(byte_value < -1 || byte_value > 255) {    //  перевірка меж
+        cout << "byte must not be 0-255 of -1 (non-zero search), got " << byte_value << "\n";
         return;
     }
 
     bool finded = false;    //  чи знайдено хоча б один збіг?
 
-    //  цикл пошуку: для addr та наступних 7 адрес
-    for(int i = 0; i < 8; i++){
+    //  цикл пошуку: для addr та наступних deepth адрес
+    for(int i = 0; i < deepth; i++){    //  до глибини пошуку
+        if((size_t)(addr + i) >= MEM_SIZE)        //  чи кінець пам'яті?
+            break;
+
         Byte mem_value = mem.data[addr + i];    //  взяти значення
 
         //  якщо співпало
-        if(static_cast<long>(mem_value) == search_byte) {
-            cout << "Value 0x" << hex << search_byte << " was finded at address 0x" << (addr+i) << dec << "\n";
+        if(
+            (static_cast<long>(mem_value) == search_byte) ||            //  збіг
+            (search_byte == -1 && static_cast<long>(mem_value) != 0)    //  ненульове значення, якщо пошук за -1
+        
+        ) {
+            cout << "Value 0x" << hex << static_cast<long>(mem_value) << " was finded at address 0x" << (addr+i) << dec << "\n";
             finded = true;
+
+            if(first_only)
+                return;
         }
     }
 
     //  якщо жодного збігу
     if(!finded) {
-        cout << "Value 0x" << hex << search_byte << " was NOT finded at 0x" << addr << " - 0x" << addr+8 << dec << "\n";
+        cout << "Value 0x" << hex << search_byte << " was NOT finded at 0x" << addr << " - 0x" << addr+deepth << dec << "\n";
     }
+}
+
+void draw_frame(Memory &mem){
+    display::clear(mem);
+    for(int i = 0; i < display::VRAM_COLS; i++)
+        display::plot(mem, i, 0);
+    //  нижня
+    for(int i = 0; i < display::VRAM_COLS; i++)
+        display::plot(mem, i, display::VRAM_ROWS-1);
+    //  ліва
+    for(int i = 0; i < display::VRAM_ROWS; i++)
+        display::plot(mem, 0, i);
+    //  права
+    for(int i = 0; i < display::VRAM_ROWS; i++)
+        display::plot(mem, display::VRAM_COLS-1, i);
 }

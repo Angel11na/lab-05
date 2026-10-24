@@ -15,16 +15,18 @@ struct DecodedOp {
 DecodedOp decode(Byte op);
 
 
-const Byte GRP_IO  = 0x0;
-const Byte GRP_ALU = 0x1;
-const Byte GRP_DATA = 0x2;
-const Byte GRP_JUMP = 0x3;
+const Byte GRP_IO       = 0x0;
+const Byte GRP_ALU      = 0x1;
+const Byte GRP_DATA     = 0x2;
+const Byte GRP_JUMP     = 0x3;
+const Byte GRP_DISPLAY  = 0x4;
 
 //  --- IO
 const Byte OP_HALT = 0x0;  //  Stop VM (exit)   0
 const Byte OP_NOP  = 0x1;  //  No operation     1
 const Byte OP_OUT  = 0x2;  //  Print A as symbol
-const Byte OP_OUTN = 0x3;  //   Print A as DEC number +space 
+const Byte OP_OUTN = 0x3;  //  Print A as DEC number +space 
+const Byte OP_OUTS = 0x04; //  Print bytes from Addr while not '\0'
 //  --- ALU
 const Byte OP_ADD  = 0x0;  //  +    16
 const Byte OP_SUB  = 0x1;  //  -    17
@@ -58,6 +60,11 @@ const Byte OP_JZ                = 0x1;  // jump, if Z=1
 const Byte OP_JNZ               = 0x2;  // jump, if Z=0
 const Byte OP_JC                = 0x3;  // jump, if C=1
 const Byte OP_JNC               = 0x4;  // jump, if C=0
+// --- DISPLAY
+const Byte OP_CLS               = 0x0;
+const Byte OP_PLOT              = 0x1;
+const Byte OP_UNPLOT            = 0x2;
+const Byte OP_SHOW              = 0x3;
 
 
 

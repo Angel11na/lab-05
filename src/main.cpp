@@ -9,33 +9,39 @@ using namespace std;
 #include "dump.hpp"
 #include "memory.hpp"
 #include "ember.hpp"
+#include "display.hpp"
 
 
 static void print_help() {
     cout << "commands:\n"
-         << "  dump                     print all " << MEM_SIZE << " bytes\n"
-         << "  get <addr>               show one byte four ways\n"
-         << "  get16 <addr>             show two bytes from addr\n"
-         << "  set <addr> <val>         write one byte (dec or 0x hex)\n"
-         << "  set16 <addr> <val>       write two bytes (dec or 0x hex)\n"
-         << "  find <lo> <hi> <byte>    find <byte> at [(<hi><lo>); (<hi><lo>+7)]"
-         << "  inc <addr>               increment value and overwrite\n"
-         << "  reg <a|b> <0..255>       set CPU register <a|b> value\n"
-         << "  regs                     show current CPU state\n"
-         << "  step                     perform one CPU instruction\n"
-         << "  run                      perform steps until HALT\n"
-         << "  help                     this list\n"
-         << "  quit                     leave\n";
+         << "  dump                                         print all " << MEM_SIZE << " bytes\n"
+         << "  get <addr>                                   show one byte four ways\n"
+         << "  get16 <addr>                                 show two bytes from addr\n"
+         << "  set <addr> <val>                             write one byte (dec or 0x hex)\n"
+         << "  set16 <addr> <val>                           write two bytes (dec or 0x hex)\n"
+         << "  find <lo> <hi> <byte> <?deepth=8>            find <byte> at memory, -1 for non-zero search\n"
+         << "  find_first <lo> <hi> <byte> <?deepth=8>      find only first <byte> at memory, -1 for non-zero search"
+         << "  inc <addr>                                   increment value and overwrite\n"
+         << "  reg <a|b> <0..255>                           set CPU register <a|b> value\n"
+         << "  regs                                         show current CPU state\n"
+         << "  step                                         perform one CPU instruction\n"
+         << "  run                                          perform steps until HALT\n"
+         << "  show                                         draw VRAM state to the console\n"
+         << "  drawframe                                    draw frame in VRAM\n"
+         << "  help                                         this list\n"
+         << "  quit                                         leave\n";
 }
+
 
 int main() {
     Memory mem; // 4096 bytes
     CPU cpu;
 
 
-    //  TEST AREA
-    mem.data[MEM_SIZE] = 1;
-    //  ---------------------------------
+    //  --------------  TEST AREA   ----------------------------------------
+
+    //  ---------------------------------------------------------------------
+
 
     cpu.mem = &mem; //  прив'язка процесора до пам'яті, & значить - "працює з пам'яттю напряму"
 
@@ -90,6 +96,16 @@ int main() {
 
         else if (cmd == "find") {
             cmd_find(mem, words);
+        }
+        else if (cmd == "find_first") {
+            cmd_find(mem, words, true);
+        }
+
+        else if(cmd == "draw_frame") {
+            draw_frame(mem);
+        }
+        else if (cmd == "show") {
+            display::show(mem);
         }
         
         else {

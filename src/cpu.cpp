@@ -3,6 +3,7 @@
 using namespace std;
 
 #include "alu.hpp"
+#include "display.hpp"
 #include "cpu.hpp"
 #include "dump.hpp"
 
@@ -49,6 +50,20 @@ static void handle_group_io(Byte op, CPU &cpu){
             cout << static_cast<int>(cpu.a) << " ";
             cpu.pc++;
             break;
+        case OP_OUTS: {
+            cpu.pc++;
+            U16 addr = get16(*cpu.mem, cpu.pc);
+            cpu.pc+=2;
+
+            for(int i = 0; i < 256; i++){
+                if(cpu.mem->data[addr + i] == '\0')
+                    break;
+                
+                cout << static_cast<char>(cpu.mem->data[addr+i]);
+            }
+
+            break;
+        }
         default:
             unknown_opcode(op, cpu);
             break;
@@ -252,6 +267,34 @@ static void handle_group_alu(Byte op, CPU &cpu){
     }
 }
 
+//  обробка оп-кодів групи DISPLAY
+static void handle_group_display(Byte op, CPU &cpu){
+    switch(op){
+        case OP_SHOW:
+            display::show(*cpu.mem);
+            cpu.pc++;
+            break;
+
+        case OP_PLOT:
+            display::plot(*cpu.mem, cpu.a, cpu.b);
+            cpu.pc++;
+            break;
+
+        case OP_UNPLOT:
+            display::unplot(*cpu.mem, cpu.a, cpu.b);
+            cpu.pc++;
+            break;
+
+        case OP_CLS:
+            display::clear(*cpu.mem);
+            cpu.pc++;
+            break;
+
+        default:
+            unknown_opcode(op,cpu);
+            break;
+    }
+}
 
 //  загальна ф-я для обробки стрибків за умови
 static void JMPX(bool flag, CPU &cpu){
@@ -307,6 +350,10 @@ void step(CPU& cpu) {
 
     DecodedOp dop = decode(op);
 
+    //  ---------------  TEST ---------------------
+    //dump_regs(cpu);
+    //  -------------------------------------------
+
     switch (dop.high) {
         case GRP_IO:
             handle_group_io(dop.low, cpu);
@@ -324,6 +371,10 @@ void step(CPU& cpu) {
             handle_group_jump(dop.low, cpu);
             break;
         
+        case GRP_DISPLAY:
+            handle_group_display(dop.low, cpu);
+            break;
+
         default:
             unknown_opcode(op, cpu);
             break;
