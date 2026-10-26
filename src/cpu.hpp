@@ -61,10 +61,10 @@ const Byte OP_JNZ               = 0x2;  // jump, if Z=0
 const Byte OP_JC                = 0x3;  // jump, if C=1
 const Byte OP_JNC               = 0x4;  // jump, if C=0
 // --- DISPLAY
-const Byte OP_CLS               = 0x0;
-const Byte OP_PLOT              = 0x1;
-const Byte OP_UNPLOT            = 0x2;
-const Byte OP_SHOW              = 0x3;
+const Byte OP_CLS               = 0x0;  //  clear VRAM
+const Byte OP_PLOT              = 0x1;  //  draw one pixel
+const Byte OP_UNPLOT            = 0x2;  //  clear one pixel
+const Byte OP_SHOW              = 0x3;  //  print VRAM in console
 
 
 

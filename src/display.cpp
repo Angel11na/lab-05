@@ -25,8 +25,10 @@ namespace display {
         int bit = 7 - (x % 8);
 
         if(set)
+            //  Для вставновлення "1" ==> операція АБО
             mem.data[address] |= ((Byte)1 << bit);
         else
+            //  Для скидання ==> операція І-НЕ
             mem.data[address] &= ~((Byte)1 << bit);
     }
 

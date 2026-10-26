@@ -14,6 +14,7 @@ static bool parse_number(const string& word, long& out) {
     }
 }
 
+
 //  =============================================================================
 //  ==============  COMMANDS
 //
@@ -220,7 +221,7 @@ void cmd_find(Memory& mem, istringstream &words, bool first_only){
     }
 }
 
-void draw_frame(Memory &mem){
+void cmd_draw_frame(Memory &mem){
     display::clear(mem);
     for(int i = 0; i < display::VRAM_COLS; i++)
         display::plot(mem, i, 0);

@@ -15,7 +15,7 @@ DecodedOp decode(Byte op) {
 }
 
 
-static bool is_mem_end(CPU &cpu){
+static bool is_mem_end(CPU &cpu) {
     size_t idx = static_cast<size_t>(cpu.pc);
     if(idx >= MEM_SIZE){
         cout << "cpu.pc >= " << MEM_SIZE << ", value was " << cpu.pc << ". CPU was halted.\n";

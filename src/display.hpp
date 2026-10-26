@@ -10,8 +10,8 @@ namespace display {
     const int VRAM_ROWS = 32;
     const int VRAM_COLS = 64;
 
-    const char VRAM_SYMBOL_FILL = '#';
-    const char VRAM_SYMBOL_EMPTY = '.';
+    const char VRAM_SYMBOL_FILL = '#';      // 
+    const char VRAM_SYMBOL_EMPTY = '.';     // 
 
 
     void show(const Memory& mem);

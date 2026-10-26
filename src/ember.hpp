@@ -23,7 +23,7 @@ void cmd_run(CPU &cpu);
 void cmd_find(Memory& mem, istringstream& words, bool first_only = false);
 
 
-void draw_frame(Memory &mem);
+void cmd_draw_frame(Memory &mem);
 
 
 #endif

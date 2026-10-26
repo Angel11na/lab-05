@@ -26,8 +26,9 @@ static void print_help() {
          << "  regs                                         show current CPU state\n"
          << "  step                                         perform one CPU instruction\n"
          << "  run                                          perform steps until HALT\n"
-         << "  show                                         draw VRAM state to the console\n"
-         << "  drawframe                                    draw frame in VRAM\n"
+         << "  vram_show                                    draw VRAM state to the console\n"
+         << "  draw_frame                                   draw frame in VRAM\n"
+         << "  vram_clear                                   clear all VRAM\n"
          << "  help                                         this list\n"
          << "  quit                                         leave\n";
 }
@@ -36,7 +37,6 @@ static void print_help() {
 int main() {
     Memory mem; // 4096 bytes
     CPU cpu;
-
 
     //  --------------  TEST AREA   ----------------------------------------
 
@@ -102,10 +102,13 @@ int main() {
         }
 
         else if(cmd == "draw_frame") {
-            draw_frame(mem);
+            cmd_draw_frame(mem);
         }
-        else if (cmd == "show") {
+        else if (cmd == "vram_show") {
             display::show(mem);
+        }
+        else if (cmd == "vram_clear") {
+            display::clear(mem);
         }
         
         else {
